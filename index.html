@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Education System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; min-height: 100vh; }
+        
+        /* ===== AUTH PAGES ===== */
+        .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; }
+        .auth-box { background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 450px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .auth-box h1 { text-align: center; color: #333; margin-bottom: 8px; font-size: 28px; }
+        .auth-box .subtitle { text-align: center; color: #888; margin-bottom: 25px; font-size: 14px; }
+        .auth-tabs { display: flex; margin-bottom: 25px; border-bottom: 2px solid #eee; }
+        .auth-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; color: #888; font-weight: 600; transition: all 0.3s; }
+        .auth-tab.active { color: #667eea; border-bottom: 2px solid #667eea; margin-bottom: -2px; }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus { border-color: #667eea; outline: none; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102,126,234,0.4); }
+        .btn-secondary { background: #f0f4f8; color: #555; }
+        .btn-secondary:hover { background: #e0e7ef; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
+        .error-msg { color: #e74c3c; font-size: 13px; margin-top: 5px; display: none; }
+        .success-msg { color: #27ae60; font-size: 13px; margin-top: 5px; display: none; }
+
+        /* ===== APP LAYOUT ===== */
+        .app-container { display: none; min-height: 100vh; }
+        .app-container.active { display: flex; }
+        .sidebar { width: 260px; background: #1a1a2e; color: white; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar .logo { font-size: 20px; font-weight: 700; margin-bottom: 30px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar .logo span { color: #667eea; }
+        .sidebar .user-info { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+        .sidebar .user-info .name { font-weight: 600; }
+        .sidebar .user-info .role { font-size: 12px; color: #aaa; }
+        .nav-item { padding: 12px 15px; margin: 4px 0; border-radius: 10px; cursor: pointer; transition: all 0.3s; color: #ccc; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: #667eea; color: white; }
+        .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+        .nav-item .badge { margin-left: auto; background: #e74c3c; color: white; border-radius: 50%; padding: 2px 8px; font-size: 11px; }
+        .main-content { margin-left: 260px; flex: 1; padding: 25px; min-height: 100vh; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .page-header h2 { color: #333; font-size: 24px; }
+        .page-header .logout-btn { padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; }
+        .page-header .logout-btn:hover { background: #c0392b; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* Cards */
+        .card { background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .card-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card .value { font-size: 32px; font-weight: 700; color: #667eea; }
+        .stat-card .label { color: #888; font-size: 13px; margin-top: 5px; }
+
+        /* Tables */
+        .table-wrapper { overflow-x: auto; margin-top: 10px; }
+        .table-wrapper table { width: 100%; border-collapse: collapse; }
+        .table-wrapper th, .table-wrapper td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e0e0e0; font-size: 14px; }
+        .table-wrapper th { background: #f8f9fa; color: #555; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        .table-wrapper td { color: #333; }
+        .table-wrapper tr:hover { background: #f8f9fa; }
+
+        /* Tags */
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .tag-high { background: #e8f5e9; color: #2e7d32; }
+        .tag-medium { background: #fff3e0; color: #e65100; }
+        .tag-low { background: #fce4ec; color: #c62828; }
+        .tag-learn { background: #e3f2fd; color: #1565c0; }
+        .tag-improve { background: #f3e5f5; color: #6a1b9a; }
+        .tag-critical { background: #fce4ec; color: #b71c1c; }
+        .tag-moderate { background: #fff3e0; color: #e65100; }
+        .tag-minor { background: #e8f5e9; color: #2e7d32; }
+        .tag-pending { background: #fff3e0; color: #e65100; }
+        .tag-completed { background: #e8f5e9; color: #2e7d32; }
+
+        /* Form inline */
+        .inline-flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .inline-flex input, .inline-flex select { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; flex: 1; min-width: 150px; }
+        .inline-flex input:focus, .inline-flex select:focus { border-color: #667eea; outline: none; }
+        
+        /* Academic form */
+        .academic-form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .academic-form select { flex: 2; min-width: 180px; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+        .academic-form input { flex: 1; min-width: 160px; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+        .academic-form select:focus, .academic-form input:focus { border-color: #667eea; outline: none; }
+        .academic-form button { white-space: nowrap; }
+
+        .mt-10 { margin-top: 10px; }
+        .mt-20 { margin-top: 20px; }
+        .mb-10 { margin-bottom: 10px; }
+        .mb-20 { margin-bottom: 20px; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .fw-600 { font-weight: 600; }
+
+        /* Progress bar */
+        .progress-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .progress-bar .fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+        .fill-green { background: #2ecc71; }
+        .fill-orange { background: #f39c12; }
+        .fill-red { background: #e74c3c; }
+
+        /* Score badge */
+        .score-badge { display: inline-block; padding: 4px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; }
+
+        /* Subject importance grid */
+        .importance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+        .importance-item { background: #f8f9fa; border-radius: 12px; padding: 15px; border-left: 4px solid #667eea; }
+        .importance-item .subj-name { font-weight: 600; color: #333; }
+        .importance-item .subj-detail { font-size: 13px; color: #888; margin-top: 3px; }
+
+        /* Skill bar */
+        .skill-bar { display: flex; align-items: center; gap: 15px; margin: 8px 0; }
+        .skill-bar .skill-name { width: 160px; font-size: 14px; color: #333; flex-shrink: 0; }
+        .skill-bar .bar-bg { flex: 1; height: 24px; background: #f0f0f0; border-radius: 12px; overflow: hidden; position: relative; min-width: 100px; }
+        .skill-bar .bar-fill { height: 100%; border-radius: 12px; transition: width 0.5s; }
+        .skill-bar .bar-label { position: absolute; right: 10px; top: 3px; font-size: 11px; color: #666; }
+        .skill-bar input[type="range"] { width: 100px; flex-shrink: 0; }
+
+        /* Timetable */
+        .timetable-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .tt-day { background: #f8f9fa; border-radius: 10px; padding: 10px; min-height: 100px; }
+        .tt-day .day-name { font-weight: 600; color: #555; font-size: 13px; margin-bottom: 8px; text-align: center; }
+        .tt-entry { background: #667eea; color: white; border-radius: 6px; padding: 6px 8px; margin-bottom: 4px; font-size: 11px; }
+
+        /* Attendance */
+        .attendance-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+        .att-item { background: #f8f9fa; border-radius: 12px; padding: 15px; }
+        .att-item .subj { font-weight: 600; color: #333; }
+
+        /* Roadmap */
+        .roadmap-phase { background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .roadmap-phase h4 { color: #667eea; margin-bottom: 10px; }
+        .roadmap-phase ul { list-style: none; padding: 0; }
+        .roadmap-phase ul li { padding: 6px 0; color: #555; font-size: 14px; position: relative; padding-left: 20px; }
+        .roadmap-phase ul li::before { content: '\2192'; position: absolute; left: 0; color: #667eea; }
+
+        /* Average bar */
+        .avg-bar { margin-top: 15px; padding: 12px 15px; background: #f8f9fa; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .avg-bar .avg-label { font-weight: 600; color: #555; }
+        .avg-bar .avg-value { font-size: 22px; font-weight: 700; color: #667eea; }
+
+        /* Warning */
+        .warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 10px 15px; margin: 8px 0; color: #856404; font-size: 13px; }
+
+        /* Subject tags */
+        .subject-tag { display: inline-block; background: #e8f0fe; color: #1a73e8; padding: 6px 14px; border-radius: 20px; font-size: 13px; margin: 3px; cursor: pointer; transition: all 0.2s; }
+        .subject-tag:hover { background: #d2e3fc; }
+        .subject-tag .remove { margin-left: 6px; font-weight: bold; cursor: pointer; }
+        .subject-tag .remove:hover { color: #e74c3c; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; padding: 10px; }
+            .sidebar .logo, .sidebar .user-info { display: none; }
+            .sidebar .nav-item span { display: none; }
+            .main-content { margin-left: 60px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .importance-grid { grid-template-columns: 1fr; }
+            .timetable-grid { grid-template-columns: repeat(2, 1fr); }
+            .academic-form { flex-direction: column; align-items: stretch; }
+            .academic-form select, .academic-form input { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== AUTH ===== -->
+<div id="authContainer" class="auth-container">
+    <div class="auth-box">
+        <h1>Smart Education System</h1>
+        <p class="subtitle">College & School Career Guidance Platform</p>
+        <div class="auth-tabs">
+            <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+            <div class="auth-tab" onclick="switchAuthTab('register')">Register</div>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form active">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="......">
+            </div>
+            <div id="loginError" class="error-msg"></div>
+            <button class="btn btn-primary" onclick="handleLogin()">Login</button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" class="auth-form">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="Your name">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Min 6 characters">
+            </div>
+            <div class="form-group">
+                <label>Education Level</label>
+                <select id="regGrade">
+                    <option value="school">School (Grade 8-10)</option>
+                    <option value="11">School (Grade 11-12)</option>
+                    <option value="college">College (UG/PG)</option>
+                </select>
+            </div>
+            <div id="registerError" class="error-msg"></div>
+            <button class="btn btn-primary" onclick="handleRegister()">Register</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="appContainer" class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Smart<span>Edu</span></div>
+        <div class="user-info">
+            <div class="name" id="sidebarName">Student</div>
+            <div class="role" id="sidebarRole">School</div>
+        </div>
+        <div class="nav-item active" onclick="navigate('dashboard')">
+            <span class="icon">📊</span><span>Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="navigate('subjects')">
+            <span class="icon">📚</span><span>My Subjects</span>
+        </div>
+        <div class="nav-item" onclick="navigate('importance')">
+            <span class="icon">🎯</span><span>Subject Importance</span>
+        </div>
+        <div class="nav-item" onclick="navigate('academics')">
+            <span class="icon">📝</span><span>Academics</span>
+        </div>
+        <div class="nav-item" onclick="navigate('attendance')">
+            <span class="icon">✅</span><span>Attendance</span>
+        </div>
+        <div class="nav-item" onclick="navigate('timetable')">
+            <span class="icon">⏰</span><span>Timetable</span>
+        </div>
+        <div class="nav-item" onclick="navigate('skills')">
+            <span class="icon">⚡</span><span>Skills & Career</span>
+        </div>
+        <div class="nav-item" onclick="navigate('roadmap')">
+            <span class="icon">🗺️</span><span>Roadmap</span>
+        </div>
+        <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div class="nav-item" onclick="handleLogout()">
+                <span class="icon">🚪</span><span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- ===== DASHBOARD ===== -->
+        <div id="page-dashboard" class="page active">
+            <div class="page-header">
+                <h2>Dashboard</h2>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+            <div class="stats-grid" id="dashboardStats"></div>
+            <div class="card">
+                <div class="card-title">Welcome, <span id="dashName">Student</span> 👋</div>
+                <p id="dashInfo" style="color:#888;">Loading your data...</p>
+            </div>
+            <div class="card">
+                <div class="card-title">📊 Academic Overview</div>
+                <div id="dashAcademic"></div>
+            </div>
+            <div class="card" id="dashAttendanceCard">
+                <div class="card-title">📋 Attendance Summary</div>
+                <div id="dashAttendance"></div>
+            </div>
+        </div>
+
+        <!-- ===== SUBJECTS ===== -->
+        <div id="page-subjects" class="page">
+            <div class="page-header">
+                <h2>My Subjects</h2>
+            </div>
+            <div class="card">
+                <div class="card-title">✏️ Add Your Own Subjects</div>
+                <p style="color:#888; font-size:14px; margin-bottom:15px;">
+                    Enter the subjects you study. These will be used for importance ratings, attendance, and academics.
+                </p>
+                <div class="inline-flex mb-10">
+                    <input type="text" id="newSubjectInput" placeholder="e.g. Data Structures" style="flex:1;">
+                    <button class="btn btn-primary btn-sm" onclick="addSubjectTag()">Add</button>
+                </div>
+                <div id="subjectTagsContainer"></div>
+                <div style="margin-top:15px;" id="subjectImportanceEditor"></div>
+                <button class="btn btn-primary mt-20" onclick="saveUserSubjects()">Save All Subjects</button>
+                <div id="subjectsSaveMsg" class="success-msg mt-10"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📖 Currently Studying</div>
+                <div id="currentSubjectsList">Loading...</div>
+            </div>
+        </div>
+
+        <!-- ===== SUBJECT IMPORTANCE ===== -->
+        <div id="page-importance" class="page">
+            <div class="page-header">
+                <h2>Subject Importance</h2>
+            </div>
+            <div class="card">
+                <div class="card-title">🎯 Priority Subjects for Your Career Path</div>
+                <p style="color:#888; font-size:14px; margin-bottom:15px;" id="importanceDesc">
+                    Based on your selected group/department and your custom subjects.
+                </p>
+                <div id="importanceList"></div>
+            </div>
+        </div>
+
+        <!-- ===== ACADEMICS (FIXED ALIGNMENT) ===== -->
+        <div id="page-academics" class="page">
+            <div class="page-header">
+                <h2>Academics</h2>
+            </div>
+            <div class="card">
+                <div class="card-title">➕ Add Marks / CGPA</div>
+                <p style="color:#888; font-size:13px; margin-bottom:12px;" id="academicHint">School: Enter marks (0-100) | College: Enter CGPA (0-10)</p>
+                <div class="academic-form">
+                    <select id="academicSubject"></select>
+                    <input type="number" id="academicMarks" placeholder="Enter score..." step="0.1" min="0" max="100">
+                    <button class="btn btn-primary btn-sm" onclick="addAcademic()">Save</button>
+                </div>
+                <div id="academicMsg" class="success-msg mt-10"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📊 Your Scores</div>
+                <div id="academicTable" class="table-wrapper"></div>
+            </div>
+        </div>
+
+        <!-- ===== ATTENDANCE ===== -->
+        <div id="page-attendance" class="page">
+            <div class="page-header">
+                <h2>Attendance</h2>
+            </div>
+            <div class="card">
+                <div class="card-title">✅ Mark Attendance</div>
+                <p style="color:#888; font-size:14px; margin-bottom:10px;">Mark each subject as Present (1) or Absent (0)</p>
+                <div id="attendanceForm"></div>
+                <button class="btn btn-primary mt-20" onclick="saveAttendance()">Save Attendance</button>
+                <div id="attendanceMsg" class="success-msg mt-10"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📊 Attendance Report</div>
+                <div id="attendanceReport"></div>
+            </div>
+        </div>
+
+        <!-- ===== TIMETABLE ===== -->
+        <div id="page-timetable" class="page">
+            <div class="page-header">
+                <h2>Custom Timetable</h2>
+            </div>
+            <div class="card">
+                <div class="card-title">⏰ Add Timetable Entry</div>
+                <div class="inline-flex">
+                    <select id="ttDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+                    <input type="text" id="ttTime" placeholder="e.g. 10:00 AM" style="flex:1;">
+                    <input type="text" id="ttSubject" placeholder="Subject name" style="flex:1;">
+                    <button class="btn btn-primary btn-sm" onclick="addTtEntry()">Add</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">📅 Weekly Timetable</div>
+                <div class="timetable-grid" id="timetableGrid"></div>
+            </div>
+        </div>
+
+        <!-- ===== SKILLS & CAREER ===== -->
+        <div id="page-skills" class="page">
+            <div class="page-header">
+                <h2>Skills & Career</h2>
+            </div>
+            <div class="card">
+                <div class="card-title">🎯 Select Your Career Goal</div>
+                <div class="inline-flex">
+                    <select id="careerSelect" style="flex:1;"></select>
+                    <button class="btn btn-primary btn-sm" onclick="updateCareer()">Set Career</button>
+                </div>
+                <div id="careerMsg" class="success-msg mt-10"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">⚡ Skill Levels</div>
+                <p style="color:#888; font-size:14px; margin-bottom:15px;">Rate your skills from 0 to 10</p>
+                <div id="skillsForm"></div>
+                <button class="btn btn-primary mt-20" onclick="saveSkills()">Save Skills</button>
+                <div id="skillsMsg" class="success-msg mt-10"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📉 Skill Gaps & Recommendations</div>
+                <div id="skillGaps"></div>
+            </div>
+        </div>
+
+        <!-- ===== ROADMAP ===== -->
+        <div id="page-roadmap" class="page">
+            <div class="page-header">
+                <h2>Learning Roadmap</h2>
+            </div>
+            <div class="card">
+                <div class="card-title">🗺️ Your Personalized Roadmap for <span id="roadmapCareer">—</span></div>
+                <div id="roadmapContent">Select a career goal in Skills page first.</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// ===== STATE =====
+let currentUser = null;
+let studentData = null;
+let subjectList = [];
+let careerList = [];
+let tempSubjects = [];
+let tempImportance = {};
+let attendanceRecords = {};
+let timetableEntries = [];
+let currentSkills = {};
+
+// ===== AUTH =====
+function switchAuthTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    if (tab === 'login') {
+        document.querySelectorAll('.auth-tab')[0].classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+    } else {
+        document.querySelectorAll('.auth-tab')[1].classList.add('active');
+        document.getElementById('registerForm').classList.add('active');
+    }
+}
+
+async function api(url, method = 'GET', body = null) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(url, opts);
+    return res.json();
+}
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    if (!email || !password) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
+    const res = await api('/api/login', 'POST', { email, password });
+    if (res.error) { errEl.textContent = res.error; errEl.style.display = 'block'; return; }
+    currentUser = res.user;
+    await loadApp();
+}
+
+async function handleRegister() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const grade = document.getElementById('regGrade').value;
+    const errEl = document.getElementById('registerError');
+    errEl.style.display = 'none';
+    if (!name || !email || !password) { errEl.textContent = 'Please fill all fields'; errEl.style.display = 'block'; return; }
+    const res = await api('/api/register', 'POST', { name, email, password, grade, education_level: grade });
+    if (res.error) { errEl.textContent = res.error; errEl.style.display = 'block'; return; }
+    currentUser = { id: res.id, name: res.name, education_level: res.education_level };
+    await loadApp();
+}
+
+async function handleLogout() {
+    await api('/api/auth/logout', 'POST');
+    currentUser = null;
+    studentData = null;
+    document.getElementById('authContainer').style.display = 'flex';
+    document.getElementById('appContainer').classList.remove('active');
+}
+
+// ===== APP LOADING =====
+async function loadApp() {
+    const check = await api('/api/auth/check');
+    if (!check.authenticated) {
+        document.getElementById('authContainer').style.display = 'flex';
+        document.getElementById('appContainer').classList.remove('active');
+        return;
+    }
+    currentUser = check.user;
+    document.getElementById('authContainer').style.display = 'none';
+    document.getElementById('appContainer').classList.add('active');
+    document.getElementById('sidebarName').textContent = currentUser.name;
+    document.getElementById('sidebarRole').textContent = currentUser.education_level === 'college' ? 'College Student' : 'School Student';
+    await loadStudentData();
+    navigate('dashboard');
+}
+
+async function loadStudentData() {
+    const res = await api('/api/student');
+    if (res.student) studentData = res.student;
+    const subRes = await api('/api/student-subjects');
+    subjectList = subRes.subjects || [];
+    const carRes = await api('/api/careers-for-user');
+    careerList = carRes.careers || [];
+}
+
+// ===== NAVIGATION =====
+function navigate(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const el = document.getElementById(`page-${page}`);
+    if (el) el.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+        if (n.textContent.trim().toLowerCase().replace(/\s/g,'').includes(page)) n.classList.add('active');
+    });
+    switch(page) {
+        case 'dashboard': loadDashboard(); break;
+        case 'subjects': loadSubjectsPage(); break;
+        case 'importance': loadImportance(); break;
+        case 'academics': loadAcademics(); break;
+        case 'attendance': loadAttendance(); break;
+        case 'timetable': loadTimetable(); break;
+        case 'skills': loadSkillsPage(); break;
+        case 'roadmap': loadRoadmap(); break;
+    }
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard() {
+    const res = await api('/api/dashboard');
+    if (res.error) return;
+    document.getElementById('dashName').textContent = res.name;
+    document.getElementById('dashInfo').textContent =
+        `Grade: ${res.grade} | ${res.is_college ? 'College' : 'School'} | Career: ${res.selected_career || 'Not set'} | Group: ${res.group_or_dept_name || 'Not set'}`;
+
+    const stats = res.stats || {};
+    document.getElementById('dashboardStats').innerHTML = `
+        <div class="stat-card"><div class="value">${res.is_college ? (stats.cgpa || '0.0') : (stats.average_marks || '0')}</div><div class="label">${res.is_college ? 'CGPA' : 'Avg Marks'}</div></div>
+        <div class="stat-card"><div class="value">${stats.attendance || '0'}%</div><div class="label">Attendance</div></div>
+        <div class="stat-card"><div class="value">${stats.skills || 0}</div><div class="label">Skills</div></div>
+        <div class="stat-card"><div class="value">${stats.subjects || 0}</div><div class="label">Subjects</div></div>
+        <div class="stat-card"><div class="value">${stats.exams || 0}</div><div class="label">Exams</div></div>
+    `;
+
+    const scores = res.scores || {};
+    const entries = Object.entries(scores);
+    let academicHtml = '';
+    if (entries.length === 0) {
+        academicHtml = '<p style="color:#888; padding:10px;">No marks entered yet. Go to Academics page.</p>';
+    } else {
+        academicHtml = `<div class="table-wrapper"><table><thead><tr><th style="width:60%;">Subject</th><th style="width:40%;text-align:center;">Score</th></tr></thead><tbody>`;
+        entries.forEach(([subj, mark]) => {
+            const isCgpa = res.score_type === 'cgpa';
+            const color = isCgpa ? (mark >= 7 ? '#2ecc71' : mark >= 5 ? '#f39c12' : '#e74c3c') : (mark >= 75 ? '#2ecc71' : mark >= 50 ? '#f39c12' : '#e74c3c');
+            const bg = isCgpa ? (mark >= 7 ? '#e8f5e9' : mark >= 5 ? '#fff3e0' : '#fce4ec') : (mark >= 75 ? '#e8f5e9' : mark >= 50 ? '#fff3e0' : '#fce4ec');
+            academicHtml += `<tr><td style="font-weight:500;">${subj}</td><td style="text-align:center;"><span class="score-badge" style="background:${bg}; color:${color};">${mark}</span></td></tr>`;
+        });
+        academicHtml += '</tbody></table></div>';
+    }
+    document.getElementById('dashAcademic').innerHTML = academicHtml;
+
+    const att = res.attendance || {};
+    const attWarnings = res.att_warnings || [];
+    let attHtml = '';
+    if (Object.keys(att).length === 0) {
+        attHtml = '<p style="color:#888; padding:10px;">No attendance data yet.</p>';
+    } else {
+        attHtml = `<div class="table-wrapper"><table><thead><tr><th>Subject</th><th style="text-align:center;">%</th><th>Bar</th></tr></thead><tbody>`;
+        Object.entries(att).forEach(([subj, pct]) => {
+            const color = pct >= 75 ? 'green' : (pct >= 50 ? 'orange' : 'red');
+            attHtml += `<tr><td style="font-weight:500;">${subj}</td><td style="text-align:center;font-weight:600;">${pct}%</td><td><div class="progress-bar"><div class="fill fill-${color}" style="width:${pct}%"></div></div></td></tr>`;
+        });
+        attHtml += '</tbody></table></div>';
+    }
+    if (attWarnings.length > 0) {
+        attWarnings.forEach(w => { attHtml += `<div class="warning">⚠️ ${w.message}</div>`; });
+    }
+    document.getElementById('dashAttendance').innerHTML = attHtml;
+}
+
+// ===== SUBJECTS PAGE =====
+async function loadSubjectsPage() {
+    const res = await api('/api/user-subjects');
+    tempSubjects = res.user_subjects || [];
+    tempImportance = res.user_subject_importance || {};
+    renderSubjectTags();
+    renderSubjectImportanceEditor();
+    renderCurrentSubjects();
+    document.getElementById('subjectsSaveMsg').style.display = 'none';
+}
+
+function renderSubjectTags() {
+    const container = document.getElementById('subjectTagsContainer');
+    if (tempSubjects.length === 0) {
+        container.innerHTML = '<p style="color:#888; font-size:13px;">No subjects added yet. Type above and click Add.</p>';
+        return;
+    }
+    container.innerHTML = tempSubjects.map((s, i) =>
+        `<span class="subject-tag">${s} <span class="remove" onclick="removeSubjectTag(${i})">×</span></span>`
+    ).join('');
+}
+
+function addSubjectTag() {
+    const input = document.getElementById('newSubjectInput');
+    const val = input.value.trim();
+    if (!val) return;
+    if (tempSubjects.includes(val)) { alert('Subject already added'); return; }
+    tempSubjects.push(val);
+    tempImportance[val] = 70;
+    input.value = '';
+    renderSubjectTags();
+    renderSubjectImportanceEditor();
+}
+
+function removeSubjectTag(index) {
+    const removed = tempSubjects[index];
+    tempSubjects.splice(index, 1);
+    delete tempImportance[removed];
+    renderSubjectTags();
+    renderSubjectImportanceEditor();
+}
+
+function renderSubjectImportanceEditor() {
+    const container = document.getElementById('subjectImportanceEditor');
+    if (tempSubjects.length === 0) { container.innerHTML = ''; return; }
+    container.innerHTML = '<p style="font-weight:600; margin-bottom:10px;">Set Importance (0-100) for each subject:</p>';
+    tempSubjects.forEach(s => {
+        const val = tempImportance[s] || 70;
+        container.innerHTML += `
+            <div class="inline-flex mb-10" style="gap:10px;">
+                <span style="width:180px; font-weight:500;">${s}</span>
+                <input type="range" min="0" max="100" value="${val}"
+                    oninput="updateImportance('${s.replace(/'/g,"\\'")}', this.value)" style="flex:1;">
+                <span id="impVal_${s.replace(/[\s']/g,'_')}" style="width:40px; text-align:center;">${val}</span>
+            </div>
+        `;
+    });
+}
+
+function updateImportance(subj, val) {
+    tempImportance[subj] = parseInt(val);
+    const el = document.getElementById(`impVal_${subj.replace(/[\s']/g,'_')}`);
+    if (el) el.textContent = val;
+}
+
+async function saveUserSubjects() {
+    const res = await api('/api/user-subjects', 'POST', { subjects: tempSubjects, importance: tempImportance });
+    const msgEl = document.getElementById('subjectsSaveMsg');
+    msgEl.textContent = res.message || 'Saved!';
+    msgEl.style.display = 'block';
+    await loadStudentData();
+    renderCurrentSubjects();
+    setTimeout(() => msgEl.style.display = 'none', 3000);
+}
+
+async function renderCurrentSubjects() {
+    const container = document.getElementById('currentSubjectsList');
+    const res = await api('/api/student-subjects');
+    const subs = res.subjects || [];
+    const usingCustom = res.using_custom || false;
+    if (subs.length === 0) {
+        container.innerHTML = '<p style="color:#888;">No subjects configured.</p>';
+        return;
+    }
+    let html = `<p style="color:#888; margin-bottom:10px;">${usingCustom ? 'Using your custom subjects' : 'Default subjects from your group/department'}</p>`;
+    html += subs.map(s => `<span class="subject-tag">${s}</span>`).join('');
+    container.innerHTML = html;
+}
+
+// ===== SUBJECT IMPORTANCE =====
+async function loadImportance() {
+    const res = await api('/api/subject-importance');
+    const list = document.getElementById('importanceList');
+    const desc = document.getElementById('importanceDesc');
+    if (res.error) { list.innerHTML = `<p style="color:#888;">${res.error}</p>`; return; }
+    desc.textContent = `Based on: ${res.group_name || 'Your subjects'}`;
+    const items = res.importance || [];
+    if (items.length === 0) {
+        list.innerHTML = '<p style="color:#888;">No subjects found. Add subjects in "My Subjects" page.</p>';
+        return;
+    }
+    list.innerHTML = `<div class="importance-grid">${items.map(item => {
+        const scoreDisplay = (item.your_score !== null && item.your_score !== undefined)
+            ? `<span style="font-size:12px; color:#888;">Your score: ${item.your_score}</span>` : '';
+        return `<div class="importance-item">
+            <div class="subj-name">${item.subject}</div>
+            <div class="subj-detail">Importance: ${item.importance}% — <span class="tag tag-${item.priority.toLowerCase()}">${item.priority}</span></div>
+            <div class="progress-bar mt-10"><div class="fill fill-${item.importance >= 80 ? 'green' : (item.importance >= 50 ? 'orange' : 'red')}" style="width:${item.importance}%"></div></div>
+            ${scoreDisplay}
+        </div>`;
+    }).join('')}</div>`;
+}
+
+// ===== ACADEMICS (FIXED ALIGNMENT) =====
+async function loadAcademics() {
+    const subRes = await api('/api/student-subjects');
+    const subs = subRes.subjects || [];
+    const isCollege = subRes.is_college || false;
+
+    document.getElementById('academicHint').textContent =
+        isCollege ? 'College: Enter CGPA (0-10)' : 'School: Enter marks (0-100)';
+    document.getElementById('academicMarks').max = isCollege ? 10 : 100;
+    document.getElementById('academicMarks').placeholder = isCollege ? 'CGPA (0-10)' : 'Marks (0-100)';
+
+    const sel = document.getElementById('academicSubject');
+    sel.innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('');
+
+    const res = await api('/api/academics', 'GET');
+    const scores = res.scores || {};
+    const scoreType = res.score_type || 'marks';
+    const table = document.getElementById('academicTable');
+    const entries = Object.entries(scores);
+
+    if (entries.length === 0) {
+        table.innerHTML = '<p style="color:#888; padding:15px; text-align:center;">No scores yet. Select a subject and enter your marks above.</p>';
+        return;
+    }
+
+    let html = `<table>
+        <thead>
+            <tr>
+                <th style="width:60%;">Subject</th>
+                <th style="width:40%;text-align:center;">${scoreType === 'cgpa' ? 'CGPA (out of 10)' : 'Marks (out of 100)'}</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    entries.forEach(([subj, mark]) => {
+        const displayMark = scoreType === 'cgpa' ? mark.toFixed(2) : mark;
+        const isCgpa = scoreType === 'cgpa';
+        const color = isCgpa ? (mark >= 7 ? '#2e7d32' : mark >= 5 ? '#e65100' : '#c62828') : (mark >= 75 ? '#2e7d32' : mark >= 50 ? '#e65100' : '#c62828');
+        const bg = isCgpa ? (mark >= 7 ? '#e8f5e9' : mark >= 5 ? '#fff3e0' : '#fce4ec') : (mark >= 75 ? '#e8f5e9' : mark >= 50 ? '#fff3e0' : '#fce4ec');
+        html += `<tr>
+            <td style="font-weight:500;">${subj}</td>
+            <td style="text-align:center;">
+                <span class="score-badge" style="background:${bg}; color:${color};">
+                    ${displayMark}
+                </span>
+            </td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+
+    const values = Object.values(scores);
+    const avg = values.reduce((a,b) => a+b, 0) / values.length;
+    html += `<div class="avg-bar">
+        <span class="avg-label">Average ${scoreType === 'cgpa' ? 'CGPA' : 'Marks'}</span>
+        <span class="avg-value">${scoreType === 'cgpa' ? avg.toFixed(2) : avg.toFixed(1)}</span>
+    </div>`;
+
+    table.innerHTML = html;
+}
+
+async function addAcademic() {
+    const subject = document.getElementById('academicSubject').value;
+    const marks = parseFloat(document.getElementById('academicMarks').value);
+    const msg = document.getElementById('academicMsg');
+
+    if (!subject) { msg.textContent = 'Please select a subject'; msg.style.color = '#e74c3c'; msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2000); return; }
+    if (isNaN(marks)) { msg.textContent = 'Please enter a valid number'; msg.style.color = '#e74c3c'; msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2000); return; }
+
+    const res = await api('/api/academics', 'POST', { subject, marks });
+    if (res.error) {
+        msg.textContent = res.error;
+        msg.style.color = '#e74c3c';
+    } else {
+        msg.textContent = `✅ ${subject}: ${marks} saved!`;
+        msg.style.color = '#27ae60';
+        document.getElementById('academicMarks').value = '';
+    }
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+    loadAcademics();
+}
+
+// ===== ATTENDANCE =====
+async function loadAttendance() {
+    const subRes = await api('/api/student-subjects');
+    const subs = subRes.subjects || [];
+    const res = await api('/api/attendance', 'GET');
+    const att = res.attendance || {};
+
+    const form = document.getElementById('attendanceForm');
+    form.innerHTML = subs.map(s => {
+        const data = att[s] || {};
+        const pct = data.percentage || 0;
+        return `
+            <div class="inline-flex mb-10" style="gap:10px;">
+                <span style="width:180px; font-weight:500;">${s}</span>
+                <label style="font-size:14px;"><input type="radio" name="att_${s}" value="1"> Present</label>
+                <label style="font-size:14px;"><input type="radio" name="att_${s}" value="0"> Absent</label>
+                ${pct > 0 ? `<span style="font-size:13px; color:#888;">Current: ${pct}%</span>` : ''}
+            </div>
+        `;
+    }).join('');
+
+    const report = document.getElementById('attendanceReport');
+    const attEntries = Object.entries(att);
+    if (attEntries.length === 0) {
+        report.innerHTML = '<p style="color:#888;">No attendance recorded yet.</p>';
+    } else {
+        report.innerHTML = `<div class="attendance-list">${attEntries.map(([subj, data]) => {
+            const color = data.percentage >= 75 ? 'green' : (data.percentage >= 50 ? 'orange' : 'red');
+            const hexColor = color === 'green' ? '#2ecc71' : (color === 'orange' ? '#f39c12' : '#e74c3c');
+            return `<div class="att-item">
+                <div class="subj">${subj}</div>
+                <div style="font-size:24px; font-weight:700; color:${hexColor};">${data.percentage}%</div>
+                <div style="font-size:13px; color:#888;">${data.present}/${data.total} days</div>
+                <div class="progress-bar"><div class="fill fill-${color}" style="width:${data.percentage}%"></div></div>
+            </div>`;
+        }).join('')}</div>`;
+    }
+
+    const warnings = res.warnings || [];
+    const warnDiv = document.createElement('div');
+    warnings.forEach(w => {
+        warnDiv.innerHTML += `<div class="warning">⚠️ ${w.message}</div>`;
+    });
+    if (warnings.length > 0) report.prepend(warnDiv);
+}
+
+document.addEventListener('change', function(e) {
+    if (e.target.name && e.target.name.startsWith('att_')) {
+        const subj = e.target.name.replace('att_', '');
+        attendanceRecords[subj] = parseInt(e.target.value);
+    }
+});
+
+async function saveAttendance() {
+    const radios = document.querySelectorAll('input[type="radio"][name^="att_"]:checked');
+    const records = {};
+    radios.forEach(r => {
+        const subj = r.name.replace('att_', '');
+        records[subj] = parseInt(r.value);
+    });
+    if (Object.keys(records).length === 0) { alert('Please mark attendance for at least one subject'); return; }
+    const res = await api('/api/attendance', 'POST', { records });
+    document.getElementById('attendanceMsg').textContent = res.message || 'Saved!';
+    document.getElementById('attendanceMsg').style.display = 'block';
+    setTimeout(() => document.getElementById('attendanceMsg').style.display = 'none', 2000);
+    loadAttendance();
+}
+
+// ===== TIMETABLE =====
+async function loadTimetable() {
+    const res = await api('/api/custom-timetable', 'GET');
+    timetableEntries = res.timetable || [];
+    renderTimetable();
+}
+
+function renderTimetable() {
+    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    const grid = document.getElementById('timetableGrid');
+    grid.innerHTML = days.map(day => {
+        const entries = timetableEntries.filter(e => e.day === day);
+        return `<div class="tt-day">
+            <div class="day-name">${day.slice(0,3)}</div>
+            ${entries.map(e => `<div class="tt-entry">${e.time || ''} ${e.subject || ''}</div>`).join('')}
+        </div>`;
+    }).join('');
+}
+
+function addTtEntry() {
+    const day = document.getElementById('ttDay').value;
+    const time = document.getElementById('ttTime').value.trim();
+    const subject = document.getElementById('ttSubject').value.trim();
+    if (!time || !subject) { alert('Fill in time and subject'); return; }
+    timetableEntries.push({ day, time, subject });
+    saveTimetable();
+    document.getElementById('ttTime').value = '';
+    document.getElementById('ttSubject').value = '';
+}
+
+async function saveTimetable() {
+    await api('/api/custom-timetable', 'POST', { entries: timetableEntries });
+    renderTimetable();
+}
+
+// ===== SKILLS & CAREER =====
+async function loadSkillsPage() {
+    const sel = document.getElementById('careerSelect');
+    sel.innerHTML = careerList.map(c => `<option value="${c}" ${studentData && studentData.selected_career === c ? 'selected' : ''}>${c}</option>`).join('');
+
+    const res = await api('/api/skills-for-career');
+    const skills = res.skills || [];
+    currentSkills = {};
+    const form = document.getElementById('skillsForm');
+    form.innerHTML = skills.map(sk => {
+        const val = sk.current || 0;
+        currentSkills[sk.key] = val;
+        return `<div class="skill-bar">
+            <div class="skill-name">${sk.name}</div>
+            <div class="bar-bg">
+                <div class="bar-fill" style="width:${(val/10)*100}%; background:${val >= 7 ? '#2ecc71' : (val >= 4 ? '#f39c12' : '#e74c3c')};"></div>
+                <span class="bar-label" id="skillLabel_${sk.key}">${val}/10</span>
+            </div>
+            <input type="range" min="0" max="10" value="${val}" oninput="updateSkill('${sk.key}', this.value)">
+        </div>`;
+    }).join('');
+    loadSkillGaps();
+}
+
+function updateSkill(key, val) {
+    currentSkills[key] = parseInt(val);
+    const label = document.getElementById(`skillLabel_${key}`);
+    if (label) label.textContent = `${val}/10`;
+}
+
+async function saveSkills() {
+    await api('/api/skills', 'POST', { skills: currentSkills });
+    document.getElementById('skillsMsg').textContent = 'Skills saved!';
+    document.getElementById('skillsMsg').style.display = 'block';
+    setTimeout(() => document.getElementById('skillsMsg').style.display = 'none', 2000);
+    loadSkillGaps();
+}
+
+async function updateCareer() {
+    const career = document.getElementById('careerSelect').value;
+    if (careerList.length === 0) return;
+    await api('/api/recommend-career', 'POST', { career });
+    document.getElementById('careerMsg').textContent = 'Career set!';
+    document.getElementById('careerMsg').style.display = 'block';
+    setTimeout(() => document.getElementById('careerMsg').style.display = 'none', 2000);
+    await loadStudentData();
+    loadSkillsPage();
+}
+
+async function loadSkillGaps() {
+    const res = await api('/api/skill-gaps');
+    const gaps = res.gaps || [];
+    const recs = res.recommendations || {};
+    const container = document.getElementById('skillGaps');
+    if (gaps.length === 0) {
+        container.innerHTML = '<p style="color:#888;">No skill gaps! You are on track for your career goal.</p>';
+        return;
+    }
+    let html = `<h4 style="margin-bottom:10px;">Skill Gaps for ${res.selected_career}</h4>`;
+    html += gaps.map(g => `
+        <div class="skill-bar">
+            <div class="skill-name">${g.skill}</div>
+            <div class="bar-bg">
+                <div class="bar-fill" style="width:${(g.current_level/10)*100}%; background:#e74c3c;"></div>
+                <span class="bar-label">${g.current_level}/${g.target_level}</span>
+            </div>
+            <span class="tag tag-${g.status.toLowerCase()}">${g.status}</span>
+            <span style="font-size:13px; color:#888;">Gap: ${g.gap}</span>
+        </div>
+    `).join('');
+    if (recs.courses && recs.courses.length > 0) {
+        html += `<h4 style="margin-top:20px;">📚 Recommended Courses</h4><ul style="padding-left:20px;">${recs.courses.map(c => `<li style="margin:4px 0;">${c}</li>`).join('')}</ul>`;
+    }
+    if (recs.projects && recs.projects.length > 0) {
+        html += `<h4 style="margin-top:15px;">🛠️ Recommended Projects</h4><ul style="padding-left:20px;">${recs.projects.map(p => `<li style="margin:4px 0;">${p}</li>`).join('')}</ul>`;
+    }
+    if (recs.practice && recs.practice.length > 0) {
+        html += `<h4 style="margin-top:15px;">🎯 Practice Resources</h4><ul style="padding-left:20px;">${recs.practice.map(p => `<li style="margin:4px 0;">${p}</li>`).join('')}</ul>`;
+    }
+    container.innerHTML = html;
+}
+
+// ===== ROADMAP =====
+async function loadRoadmap() {
+    const res = await api('/api/roadmap');
+    if (res.error) { document.getElementById('roadmapContent').innerHTML = `<p style="color:#888;">${res.error}</p>`; return; }
+    document.getElementById('roadmapCareer').textContent = res.career || '—';
+    const content = document.getElementById('roadmapContent');
+    if (!res.short_term || res.short_term.length === 0) {
+        content.innerHTML = '<p style="color:#888;">Select a career goal in Skills page to generate your roadmap.</p>';
+        return;
+    }
+    content.innerHTML = `
+        <div class="roadmap-phase">
+            <h4>🟢 Short Term (Now — 3 months)</h4>
+            <ul>${res.short_term.map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>
+        <div class="roadmap-phase">
+            <h4>🟡 Medium Term (3 — 6 months)</h4>
+            <ul>${res.medium_term.map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>
+        <div class="roadmap-phase">
+            <h4>🔴 Long Term (6 months — 1 year)</h4>
+            <ul>${res.long_term.map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>
+    `;
+}
+
+// ===== CHECK AUTH ON LOAD =====
+window.onload = async function() {
+    const check = await api('/api/auth/check');
+    if (check.authenticated) {
+        currentUser = check.user;
+        await loadApp();
+    }
+};
+</script>
+</body>
+</html>

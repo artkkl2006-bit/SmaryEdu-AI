@@ -1,0 +1,321 @@
+{
+  "89aeb6ed": {
+    "name": "suba",
+    "grade": "10",
+    "career_interest": "software engineer",
+    "recommended_group": "Science_Maths",
+    "selected_career": "Software Engineer",
+    "scores": {
+      "Mathematics": 89,
+      "Computer Science": 99,
+      "Physics": 89,
+      "Chemistry": 93,
+      "English": 60,
+      "Biology": 89
+    },
+    "attendance": {
+      "Biology": [
+        true
+      ],
+      "Chemistry": [
+        false
+      ],
+      "Computer Science": [
+        true
+      ],
+      "English": [
+        false
+      ],
+      "Mathematics": [
+        true
+      ],
+      "Physics": [
+        true
+      ]
+    },
+    "assignments": [
+      {
+        "name": "assignment 1",
+        "subject": "maths",
+        "marks": 90,
+        "total": 100,
+        "status": "completed",
+        "id": "cd81bc"
+      }
+    ],
+    "exams": [
+      {
+        "name": "quartally",
+        "subject": "maths",
+        "marks": 90,
+        "total": 100,
+        "rank": "",
+        "id": "0d6892"
+      }
+    ],
+    "skills": {
+      "Python": 1,
+      "Java": 5,
+      "Data_Analysis": 1,
+      "Machine_Learning": 1,
+      "Web_Dev": 1,
+      "Communication": 1,
+      "Leadership": 2,
+      "Accounting": 0,
+      "Design": 0,
+      "Biology_Lab": 0
+    }
+  },
+  "50bbb66e": {
+    "email": "suba.sh452006@gmail.com",
+    "password": "6f6a4e56098cfd9af29e3ae549503b370211a4e94421457fe4cfd39a38a1fa08",
+    "name": "Subashini T",
+    "grade": "College",
+    "career_interest": "Subjects: tamil, english, maths, science, social science",
+    "recommended_group": "Arts_Humanities",
+    "selected_career": "Lawyer",
+    "scores": {
+      "Tamil": 92,
+      "English": 92,
+      "Maths": 98,
+      "Science": 92,
+      "Social Science": 94
+    },
+    "attendance": {
+      "Political Science": [
+        [
+          true
+        ]
+      ]
+    },
+    "assignments": [
+      {
+        "name": "assignment 1",
+        "subject": "maths",
+        "marks": 95,
+        "total": 100,
+        "status": "completed",
+        "id": "eb0042"
+      }
+    ],
+    "exams": [
+      {
+        "name": "Quarterly",
+        "subject": "maths",
+        "marks": 95,
+        "total": 100,
+        "exam_type": "quarterly",
+        "rank": "",
+        "id": "4fe202"
+      }
+    ],
+    "skills": {
+      "Communication": 4,
+      "Leadership": 4,
+      "Research_Methodology": 4
+    },
+    "profile_completed": true,
+    "custom_timetable": []
+  },
+  "f81faa96": {
+    "email": "artkkl2006@gmail.com",
+    "password": "6f6a4e56098cfd9af29e3ae549503b370211a4e94421457fe4cfd39a38a1fa08",
+    "name": "Kalaiselvi K",
+    "grade": "College",
+    "student_type": "college",
+    "education_level": "College",
+    "career_interest": "Subjects: software engineer",
+    "recommended_group": "CSE",
+    "selected_career": "Software Engineer",
+    "scores": {},
+    "score_type": "cgpa",
+    "attendance": {
+      "Data Structures": [
+        [
+          true
+        ],
+        [
+          true
+        ]
+      ],
+      "Database Systems": [
+        [
+          true
+        ]
+      ],
+      "Software Engineering": [
+        [
+          true
+        ]
+      ],
+      "Operating Systems": [
+        [
+          true
+        ]
+      ],
+      "Computer Networks": [
+        [
+          true
+        ]
+      ]
+    },
+    "custom_timetable": [],
+    "assignments": [],
+    "exams": [],
+    "skills": {
+      "Python": 3,
+      "Java": 3,
+      "Data_Analysis": 1,
+      "Machine_Learning": 1,
+      "Web_Dev": 4,
+      "Communication": 3,
+      "Leadership": 2,
+      "Accounting": 0,
+      "Design": 3,
+      "Biology_Lab": 0,
+      "Clinical_Skills": 0,
+      "Financial_Analysis": 0,
+      "Communication_Systems": 0,
+      "CAD_Design": 0,
+      "Research_Methodology": 0
+    },
+    "profile_completed": true,
+    "created_at": "2026-08-23T21:27:51.835860",
+    "user_subjects": [
+      "Database Management",
+      "Java"
+    ],
+    "user_subject_importance": {
+      "Database Management": 70,
+      "Java": 70
+    }
+  },
+  "ed0ce2dc": {
+    "email": "subashinithangaraj96@gmail.com",
+    "password": "f37f3f2b0dc57a86dee4ba6ff855283bb4d2f0dea1c5bd1b708853444c2ffcec",
+    "name": "Subashini T",
+    "grade": "College",
+    "student_type": "college",
+    "education_level": "College",
+    "career_interest": "Subjects: software",
+    "recommended_group": "CSE",
+    "selected_career": "Software Engineer",
+    "scores": {
+      "Data Structures": 8,
+      "Algorithms": 9,
+      "Operating Systems": 8,
+      "Computer Networks": 9,
+      "Database Systems": 10,
+      "Software Engineering": 9,
+      "Programming Lab": 10,
+      "Web Development Lab": 9,
+      "Database Lab": 9,
+      "Networks Lab": 8,
+      "Project Work": 10
+    },
+    "score_type": "cgpa",
+    "attendance": {
+      "Data Structures": [
+        [
+          true
+        ],
+        [
+          true
+        ]
+      ]
+    },
+    "custom_timetable": [],
+    "assignments": [
+      {
+        "name": "assignment 1",
+        "subject": "Database",
+        "marks": 95,
+        "total": 100,
+        "status": "completed",
+        "id": "d06157"
+      }
+    ],
+    "exams": [
+      {
+        "name": "semester",
+        "subject": "Database Management",
+        "marks": 95,
+        "total": 100,
+        "exam_type": "semester",
+        "rank": "",
+        "id": "2cd936"
+      }
+    ],
+    "skills": {
+      "Python": 6,
+      "Java": 6,
+      "Web_Dev": 3,
+      "Communication": 4
+    },
+    "profile_completed": true,
+    "created_at": "2026-08-23T22:30:28.234396"
+  },
+  "cdd44e0b": {
+    "email": "manothanam2008@gmail.com",
+    "password": "6f6a4e56098cfd9af29e3ae549503b370211a4e94421457fe4cfd39a38a1fa08",
+    "name": "Madhu",
+    "grade": "College",
+    "student_type": "college",
+    "education_level": "College",
+    "career_interest": "Software Engineer",
+    "recommended_group": "CSE",
+    "selected_career": "Software Engineer",
+    "scores": {
+      "Database Management": 10,
+      "Java": 9,
+      "Algorithm": 9
+    },
+    "score_type": "cgpa",
+    "attendance": {
+      "Database Management": [
+        1,
+        1
+      ],
+      "Java": [
+        1,
+        1
+      ],
+      "Algorithm": [
+        0,
+        0
+      ]
+    },
+    "custom_timetable": [],
+    "assignments": [],
+    "exams": [],
+    "skills": {
+      "Python": 0,
+      "Java": 0,
+      "Data_Analysis": 0,
+      "Machine_Learning": 0,
+      "Web_Dev": 0,
+      "Communication": 1,
+      "Leadership": 0,
+      "Accounting": 0,
+      "Design": 0,
+      "Biology_Lab": 2,
+      "Clinical_Skills": 0,
+      "Financial_Analysis": 2,
+      "Communication_Systems": 0,
+      "CAD_Design": 0,
+      "Research_Methodology": 0
+    },
+    "profile_completed": false,
+    "created_at": "2026-08-24T00:31:09.049567",
+    "user_subjects": [
+      "Database Management",
+      "Java",
+      "Algorithm"
+    ],
+    "user_subject_importance": {
+      "Database Management": 70,
+      "Java": 70,
+      "Algorithm": 70
+    }
+  }
+}
